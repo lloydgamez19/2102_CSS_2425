@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,7 @@ public class Customers {
         ResultSet checkRs = checkStmt.executeQuery();
 
         if (checkRs.next()) {
+            connection.close();
             return false;
         } else {
             String query = "INSERT INTO users (username, password, role) VALUES (?, ?, 'customer')";
@@ -153,7 +155,7 @@ public class Customers {
             System.out.println("Your Orders:");
             for (Order order : orders) {
                 if (order.customerName.equals(currentUsername)) { // Filter orders by current customer
-                    System.out.println("Order ID: " + order.id + ", Items: " + order.items + ", Total: " + order.total + ", Status: " + order.status);
+                    System.out.println("Order ID: " + order.id + ", Items: " + order.items + ", Total: " + order.total + ", Status: " + order.status + ", Ordered At: " + order.orderTime + ", Last Updated: " + order.updateTime);
                 }
             }
         } catch (SQLException e) {
@@ -176,7 +178,7 @@ public class Customers {
         System.out.println("Thank you for your order!");
 
         // Save order to database
-        OrderService.addOrder(new Order(0, currentUsername, items.toString(), total, "pending"));
+        OrderService.addOrder(new Order(0, currentUsername, items.toString(), total, "pending", new Timestamp(System.currentTimeMillis()), null));
 
         // Clear the cart after checkout
         cart.clear();
