@@ -14,7 +14,7 @@ public class OrderService {
         return DriverManager.getConnection(url, username, password);
     }
 
-    // Method to view all orders
+    // Method to view all orders....
     public static List<Order> viewAllOrders() throws SQLException {
         Connection connection = getConnection();
         String query = "SELECT * FROM orders";

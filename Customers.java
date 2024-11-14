@@ -67,11 +67,12 @@ public class Customers {
         List<OrderItem> cart = new ArrayList<>();
 
         while (!exit) {
+            System.out.println();
             System.out.println("***Customer Home Page***");
             System.out.println("1. View MenuItems");
             System.out.println("2. View Cart");
-            System.out.println("3. View Orders");
-            System.out.println("4. Checkout and Get Receipt");
+            System.out.println("3. View Processed Order ");
+            System.out.println("4. Place Order and Get Receipt");
             System.out.println("5. Logout");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
@@ -104,7 +105,7 @@ public class Customers {
     // Function to view menu items and add to cart
     public static void viewMenuItems(List<OrderItem> cart) {
         Scanner scanner = new Scanner(System.in);
-        String[] menuItems = {"Pizza", "Burger", "Pasta", "Sushi", "Steak"};
+        String[] menuItems = {"Pizza Hot", "Burger", "Pasta", "Sushi", "Steak"};
         double[] prices = {10.0, 8.0, 12.0, 15.0, 20.0};
         boolean exit = false;
 
@@ -134,6 +135,7 @@ public class Customers {
 
     // Function to view cart
     public static void viewCart(List<OrderItem> cart) {
+        System.out.println();
         System.out.println("Your Cart:");
         double total = 0.0;
         if (cart.isEmpty()) {
@@ -149,40 +151,78 @@ public class Customers {
     }
 
     // Function to view orders
-    public static void viewOrders() {
-        try {
-            List<Order> orders = OrderService.viewAllOrders();
-            System.out.println("Your Orders:");
-            for (Order order : orders) {
-                if (order.customerName.equals(currentUsername)) { // Filter orders by current customer
-                    System.out.println("Order ID: " + order.id + ", Items: " + order.items + ", Total: " + order.total + ", Status: " + order.status + ", Ordered At: " + order.orderTime + ", Last Updated: " + order.updateTime);
-                }
+public static void viewOrders() {
+    try {
+        List<Order> orders = OrderService.viewAllOrders();
+        System.out.println("");
+        System.out.println("Your Orders:");
+        for (Order order : orders) {
+            if (order.customerName.equals(currentUsername)) { // Filter orders by current customer
+                System.out.println("================================");
+                System.out.println("Order ID: " + order.id);
+                System.out.println("Customer: " + order.customerName);
+                System.out.println("Items: " + order.items);
+                System.out.println("Total: $" + order.total);
+                System.out.println("Status: " + order.status);
+                System.out.println("Ordered At: " + order.orderTime);
+                System.out.println("Last Updated: " + order.updateTime);
+                System.out.println("================================");
+                System.out.println("");
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+}
+
+
+    // Function that generates receipt
+public static void checkout(List<OrderItem> cart) throws SQLException {
+    System.out.println("***********************************");
+    System.out.println("           ORDER RECEIPT           ");
+    System.out.println("***********************************");
+    System.out.println("Customer: " + currentUsername);
+    System.out.println("Order Date: " + new Timestamp(System.currentTimeMillis()));
+    System.out.println("-----------------------------------");
+
+    double total = 0.0;
+    StringBuilder items = new StringBuilder();
+    for (OrderItem item : cart) {
+        double itemTotal = item.price * item.quantity;
+        total += itemTotal;
+        items.append(item.name).append(" x ").append(item.quantity).append(", ");
+        System.out.printf("%-20s x%-3d $%.2f\n", item.name, item.quantity, itemTotal);
     }
 
-    // Function to checkout and generate a receipt
-    public static void checkout(List<OrderItem> cart) throws SQLException {
-        System.out.println("Receipt:");
-        double total = 0.0;
-        StringBuilder items = new StringBuilder();
-        for (OrderItem item : cart) {
-            double itemTotal = item.price * item.quantity;
-            total += itemTotal;
-            items.append(item.name).append(" x ").append(item.quantity).append(", ");
-            System.out.println("- " + item.name + " x " + item.quantity + " @ $" + item.price + " each = $" + itemTotal);
+    System.out.println("-----------------------------------");
+    System.out.printf("%-23s $%.2f\n", "TOTAL", total);
+    System.out.println("-----------------------------------");
+    System.out.println("       Thank you for your order!   ");
+    System.out.println("***********************************");
+
+    // Save order to database
+    OrderService.addOrder(new Order(0, currentUsername, items.toString(), total, "pending", new Timestamp(System.currentTimeMillis()), null));
+
+    // Clear the cart after checkout
+    cart.clear();
+}
+
+    
+    // Method to view customer order history
+public static void viewOrderHistory() {
+    try {
+        List<Order> orders = OrderService.viewAllOrders();
+        System.out.println("Order History:");
+        for (Order order : orders) {
+            if (order.customerName.equals(currentUsername)) { // Filter orders by current customer
+                System.out.println("Order ID: " + order.id + ", Items: " + order.items + ", Total: " + order.total + ", Status: " + order.status + ", Ordered At: " + order.orderTime + ", Last Updated: " + order.updateTime);
+            }
         }
-        System.out.println("Total: $" + total);
-        System.out.println("Thank you for your order!");
-
-        // Save order to database
-        OrderService.addOrder(new Order(0, currentUsername, items.toString(), total, "pending", new Timestamp(System.currentTimeMillis()), null));
-
-        // Clear the cart after checkout
-        cart.clear();
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+}
+
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -218,6 +258,7 @@ public class Customers {
 
                     boolean loggedIn = validateCustomer(username, password);
                     if (loggedIn) {
+                        System.out.println();
                         System.out.println("Login successful!");
                         showCustomerHomePage();
                     } else {
@@ -232,12 +273,13 @@ public class Customers {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+            
         }
         scanner.close();
     }
 }
 
-// Class to represent an order item
+// Class to represent an order item......
 class OrderItem {
     String name;
     double price;
