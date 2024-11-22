@@ -1,4 +1,4 @@
-package myproject_catering;
+package myproject_catering.customer;
 
 public class MenuItem {
     private int id;
@@ -6,6 +6,7 @@ public class MenuItem {
     private String description;
     private double price;
 
+    // menu initialization
     public MenuItem(int id, String name, String description, double price) {
         this.id = id;
         this.name = name;
@@ -13,24 +14,29 @@ public class MenuItem {
         this.price = price;
     }
 
+    
     public int getId() {
         return id;
     }
 
+    
     public String getName() {
         return name;
     }
 
+   
     public String getDescription() {
         return description;
     }
 
+   
     public double getPrice() {
         return price;
     }
 
+    // for easier printinggg
     @Override
     public String toString() {
-        return "ID: " + id + ", Name: " + name + ", Description: " + description + ", Price: Php " + price;
+        return String.format("MenuItem{id=%d, name='%s', description='%s', price=%.2f}", id, name, description, price);
     }
 }

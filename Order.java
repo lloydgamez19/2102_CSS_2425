@@ -1,44 +1,40 @@
-package myproject_catering;
+package myproject_catering.customer;
 
-import java.util.ArrayList;
 import java.util.List;
-import myproject_catering.customer.MenuItem;
+import java.time.LocalDateTime;
+import myproject_catering.customer.CartItem;
 
 public class Order {
-    private final int orderId;
-    private final int customerId;
-    private final List<MenuItem> orderItems;
-    private final double totalCost;
+    private int orderId;
+    private Customer customer;
+    private List<CartItem> items;
+    private double total;
     private String status;
+    private LocalDateTime orderDate;
 
-    // Constructor
-    public Order(int orderId, int customerId, List<MenuItem> orderItems, double totalCost, String status) {
+    public Order(int orderId, Customer customer, List<CartItem> items, double total, String status, LocalDateTime orderDate) {
         this.orderId = orderId;
-        this.customerId = customerId;
-        this.orderItems = orderItems != null ? orderItems : new ArrayList<>(); // Prevent null list
-        this.totalCost = totalCost;
-        this.status = status != null ? status : "Pending"; // Default status to "Pending" if null
+        this.customer = customer;
+        this.items = items;
+        this.total = total;
+        this.status = status;
+        this.orderDate = orderDate;
     }
 
-    public Order(int i, int id, ArrayList<MenuItem> arrayList, double totalCost, String pending, String paymentMethod) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    
     public int getOrderId() {
         return orderId;
     }
 
-    public int getCustomerId() {
-        return customerId;
+    public Customer getCustomer() {
+        return customer;
     }
 
-    public List<MenuItem> getOrderItems() {
-        return orderItems;
+    public List<CartItem> getItems() {
+        return items;
     }
 
-    public double getTotalCost() {
-        return totalCost;
+    public double getTotal() {
+        return total;
     }
 
     public String getStatus() {
@@ -46,25 +42,25 @@ public class Order {
     }
 
     public void setStatus(String status) {
-        this.status = status != null ? status : this.status; 
+        this.status = status;
+    }
+
+    public LocalDateTime getOrderDate() {
+        return orderDate;
     }
 
     @Override
     public String toString() {
-        StringBuilder itemsStr = new StringBuilder();
+        return "Order ID: " + orderId + "\nCustomer: " + customer.getName() + "\nItems: " + items + "\nTotal: Php " + total + "\nStatus: " + status + "\nOrder Date: " + orderDate;
+    }
 
-        if (orderItems == null || orderItems.isEmpty()) {
-            StringBuilder append = itemsStr.append("No items");
-        } else {
-            for (MenuItem item : orderItems) {
-                itemsStr.append("\n- ").append(item.getName())
-                        .append(" (PHP ").append(String.format("%.2f", item.getPrice())).append(")");
-            }
+    public String getOrderDetails() {
+        StringBuilder details = new StringBuilder();
+        for (CartItem cartItem : items) {
+            details.append(cartItem.toString()).append("\n");
         }
-
-        return String.format(
-            "Order ID: %d\nCustomer ID: %d\nTotal Cost: PHP %.2f\nStatus: %s\nItems:%s",
-            orderId, customerId, totalCost, status, itemsStr.toString()
-        );
+        details.append("Total: Php ").append(total).append("\nStatus: ").append(status)
+                .append("\nOrder Date: ").append(orderDate);
+        return details.toString();
     }
 }
